@@ -1,23 +1,17 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
-
-# Add your action's branding here. This will appear on the GitHub Marketplace.
-branding:
-  icon: 'heart'
-  color: 'red'
+name: 'Coverage Reader'
+description: 'Reads the code coverage from the supplied XML string.'
+author: 'TeqBench'
 
 # Define your inputs here.
 inputs:
-  milliseconds:
-    description: 'Your input description here'
+  coverage-xml:
+    description: 'An XML string with code coverage data. Must conform Cobertura format.'
     required: true
-    default: '1000'
 
 # Define your outputs here.
 outputs:
-  time:
-    description: 'Your output description here'
+  coverage:
+    description: 'The code coverage as a percentage, i.e. 90.5'
 
 runs:
   using: node20
