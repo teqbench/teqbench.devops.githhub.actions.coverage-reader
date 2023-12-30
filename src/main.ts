@@ -1,26 +1,40 @@
 import * as core from '@actions/core'
-import { wait } from './wait'
+
+import xml2js from 'xml2js'
+import xpath from 'xml2js-xpath'
 
 /**
  * The main function for the action.
+ *
  * @returns {Promise<void>} Resolves when the action is complete.
  */
 export async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
+    const xml: string = core.getInput('coverage-xml')
+    const parser = new xml2js.Parser()
 
-    // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    parser.parseString(xml, function (error, json) {
+      if (error) {
+        throw new Error('Error occurred while processing coverage XML.', error)
+      } else {
+        // Find the first coverage element and get its line-rate attribute value.
+        const lineRate = xpath.evalFirst(json, '//coverage', 'line-rate')
 
-    // Log the current timestamp, wait, then log the new timestamp
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+        if (isNaN(lineRate)) {
+          throw new Error(
+            "Coverage 'line-rate' attribute value is not a number."
+          )
+        }
 
-    // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
+        // Set output for other workflow steps to use
+        // Multiply the lineRate by 100 to return as percentage
+        core.setOutput('coverage', (lineRate ?? 0) * 100)
+      }
+    })
   } catch (error) {
     // Fail the workflow run if an error occurs
-    if (error instanceof Error) core.setFailed(error.message)
+    if (error instanceof Error) {
+      core.setFailed(error.message)
+    }
   }
 }
