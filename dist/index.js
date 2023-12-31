@@ -26947,6 +26947,7 @@ const xml2js_xpath_1 = __importDefault(__nccwpck_require__(5321));
 async function run() {
     try {
         const xml = core.getInput('coverage-xml');
+        console.log(`supplied xml = ${xml}`);
         const parser = new xml2js_1.default.Parser();
         parser.parseString(xml, function (error, json) {
             // The callback function appears to modify the thrown exception and the outter try catch block
@@ -26959,6 +26960,7 @@ async function run() {
                 else {
                     // Find the first coverage element and get its line-rate attribute value.
                     const lineRate = xml2js_xpath_1.default.evalFirst(json, '//coverage', 'line-rate');
+                    console.log(`line-rate = ${lineRate}`);
                     if (lineRate === null ||
                         lineRate === '' ||
                         isNaN(Number(lineRate.toString()))) {
