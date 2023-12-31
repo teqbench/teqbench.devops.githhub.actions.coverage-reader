@@ -16,7 +16,7 @@ const runMock = jest.spyOn(main, 'run')
 // let debugMock: jest.SpyInstance
 let errorMock: jest.SpyInstance
 let getInputMock: jest.SpyInstance
-// let setFailedMock: jest.SpyInstance
+let setFailedMock: jest.SpyInstance
 let setOutputMock: jest.SpyInstance
 
 describe('action', () => {
@@ -26,16 +26,16 @@ describe('action', () => {
     // debugMock = jest.spyOn(core, 'debug').mockImplementation()
     errorMock = jest.spyOn(core, 'error').mockImplementation()
     getInputMock = jest.spyOn(core, 'getInput').mockImplementation()
-    // setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation()
+    setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation()
     setOutputMock = jest.spyOn(core, 'setOutput').mockImplementation()
   })
 
-  it('Read valid coverage XML and return %', async () => {
+  it('Read valid coverage XML and return 70.8%', async () => {
     // Set the action's inputs as return values from core.getInput()
     getInputMock.mockImplementation((name: string): string => {
       switch (name) {
         case 'coverage-xml':
-          return '<coverage line-rate="0.708" branch-rate="0.5" version="1.9" timestamp="1703907994" lines-covered="17" lines-valid="24" branches-covered="2" branches-valid="4"><sources><source>/Users/ben/Development/TeqBench/GitHub/teqbench.system.data.nosql.mongodb.models/src/</source>  </sources></coverage>'
+          return '<coverage line-rate="0.708"></coverage>'
         default:
           return ''
       }
@@ -44,8 +44,54 @@ describe('action', () => {
     await main.run()
     expect(runMock).toHaveReturned()
 
+    expect(setOutputMock).toHaveBeenCalledTimes(2)
+    expect(setOutputMock).toHaveBeenCalledWith('coverage', 70.8)
+    expect(setOutputMock).toHaveBeenCalledWith('coverage-foratted', '70.8%')
+
+    expect(errorMock).not.toHaveBeenCalled()
+  })
+
+  it('Read valid coverage XML and return 70%', async () => {
+    // Set the action's inputs as return values from core.getInput()
+    getInputMock.mockImplementation((name: string): string => {
+      switch (name) {
+        case 'coverage-xml':
+          return '<coverage line-rate="0.70"></coverage>'
+        default:
+          return ''
+      }
+    })
+
+    await main.run()
+    expect(runMock).toHaveReturned()
+
+    expect(setOutputMock).toHaveBeenCalledTimes(2)
+    expect(setOutputMock).toHaveBeenCalledWith('coverage', 70)
+    expect(setOutputMock).toHaveBeenCalledWith('coverage-foratted', '70%')
+
+    expect(errorMock).not.toHaveBeenCalled()
+  })
+
+  it('coverage xml line-rate not a number', async () => {
+    // Set the action's inputs as return values from core.getInput()
+    getInputMock.mockImplementation((name: string): string => {
+      switch (name) {
+        case 'coverage-xml':
+          return '<coverage line-rate="nan"></coverage>'
+        default:
+          return ''
+      }
+    })
+
+    await main.run()
+
+    expect(runMock).toHaveReturned()
+
     // Verify that all of the core library functions were called correctly
-    expect(setOutputMock).toHaveBeenNthCalledWith(1, 'coverage', 70.8)
+    expect(setFailedMock).toHaveBeenNthCalledWith(
+      1,
+      "Coverage 'line-rate' attribute value is not a number."
+    )
     expect(errorMock).not.toHaveBeenCalled()
   })
 })
