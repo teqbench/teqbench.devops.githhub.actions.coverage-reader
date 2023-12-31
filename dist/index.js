@@ -26959,8 +26959,8 @@ async function run() {
                 else {
                     // Find the first coverage element and get its line-rate attribute value.
                     const lineRate = xml2js_xpath_1.default.evalFirst(json, '//coverage', 'line-rate');
-                    if (lineRate == null ||
-                        lineRate == '' ||
+                    if (lineRate === null ||
+                        lineRate === '' ||
                         isNaN(Number(lineRate.toString()))) {
                         throw new Error("Coverage 'line-rate' attribute value is not a number.");
                     }
@@ -26972,10 +26972,10 @@ async function run() {
                     core.setOutput('coverage-foratted', `${+coverage.toFixed(2)}%`);
                 }
             }
-            catch (error) {
+            catch (e) {
                 // Fail the workflow run if an error occurs
-                if (error instanceof Error) {
-                    core.setFailed(error.message);
+                if (e instanceof Error) {
+                    core.setFailed(e.message);
                 }
             }
         });

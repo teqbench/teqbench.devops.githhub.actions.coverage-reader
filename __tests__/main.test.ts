@@ -8,7 +8,6 @@
 
 import * as core from '@actions/core'
 import * as main from '../src/main'
-import exp from 'constants'
 
 // Mock the action's main function
 const runMock = jest.spyOn(main, 'run')

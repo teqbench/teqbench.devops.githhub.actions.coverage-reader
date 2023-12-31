@@ -28,8 +28,8 @@ export async function run(): Promise<void> {
           const lineRate = xpath.evalFirst(json, '//coverage', 'line-rate')
 
           if (
-            lineRate == null ||
-            lineRate == '' ||
+            lineRate === null ||
+            lineRate === '' ||
             isNaN(Number(lineRate.toString()))
           ) {
             throw new Error(
@@ -39,16 +39,16 @@ export async function run(): Promise<void> {
 
           // Set output for other workflow steps to use
           // Multiply the lineRate by 100 to return as percentage
-          const coverage: Number = (lineRate ?? 0) * 100
+          const coverage: number = (lineRate ?? 0) * 100
           core.setOutput('coverage', coverage)
 
           // The pluse sign before coverage var is to remove any trailing zeros as a result of the toFixed operation.
           core.setOutput('coverage-foratted', `${+coverage.toFixed(2)}%`)
         }
-      } catch (error) {
+      } catch (e) {
         // Fail the workflow run if an error occurs
-        if (error instanceof Error) {
-          core.setFailed(error.message)
+        if (e instanceof Error) {
+          core.setFailed(e.message)
         }
       }
     })
