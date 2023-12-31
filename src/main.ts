@@ -11,6 +11,9 @@ import xpath from 'xml2js-xpath'
 export async function run(): Promise<void> {
   try {
     const xml: string = core.getInput('coverage-xml')
+
+    console.log(`supplied xml = ${xml}`)
+
     const parser = new xml2js.Parser()
 
     parser.parseString(xml, function (error, json) {
@@ -26,6 +29,8 @@ export async function run(): Promise<void> {
         } else {
           // Find the first coverage element and get its line-rate attribute value.
           const lineRate = xpath.evalFirst(json, '//coverage', 'line-rate')
+
+          console.log(`line-rate = ${lineRate}`)
 
           if (
             lineRate === null ||
